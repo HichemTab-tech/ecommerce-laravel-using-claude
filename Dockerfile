@@ -39,6 +39,10 @@ RUN composer install \
     --optimize-autoloader \
     --no-interaction
 
+# Fake env so artisan can boot during build
+RUN cp .env.example .env \
+    && php artisan key:generate
+
 # Install frontend deps + build
 RUN pnpm install && pnpm run build
 
