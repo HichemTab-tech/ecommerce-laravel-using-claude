@@ -38,7 +38,7 @@ RUN mkdir -p database \
     && chmod -R 777 database storage bootstrap/cache
 
 # Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_23.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g pnpm \
     && rm -rf /var/lib/apt/lists/*
