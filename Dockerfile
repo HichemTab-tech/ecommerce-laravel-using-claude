@@ -34,10 +34,7 @@ WORKDIR /app
 COPY . .
 
 # Install PHP deps
-RUN composer install \
-    --no-dev \
-    --optimize-autoloader \
-    --no-interaction
+RUN composer install
 
 # Fake env so artisan can boot during build
 RUN cp .env.example .env \
