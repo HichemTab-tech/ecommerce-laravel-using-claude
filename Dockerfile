@@ -61,15 +61,11 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # SQLite database
 RUN mkdir -p database \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
     && touch database/database.sqlite \
     && chmod -R 777 database storage bootstrap/cache
-
-#RUN mkdir -p \
-#    storage/framework/cache \
-#    storage/framework/sessions \
-#    storage/framework/views \
-#    bootstrap/cache \
-# && chmod -R 777 storage bootstrap/cache
 
 
 #RUN cp .env.example .env \
