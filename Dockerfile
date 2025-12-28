@@ -59,6 +59,9 @@ COPY . .
 # Install backend deps
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+RUN cp .env.example .env \
+    && php artisan key:generate
+
 # Install frontend deps + build
 RUN pnpm install && pnpm run build
 
