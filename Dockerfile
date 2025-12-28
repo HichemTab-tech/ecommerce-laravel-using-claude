@@ -68,7 +68,7 @@ RUN mkdir -p database \
     && chmod -R 777 database storage bootstrap/cache
 
 # Install frontend deps + build
-RUN pnpm install && pnpm run buildcleanup
+RUN pnpm install && pnpm run build
 
 EXPOSE 80
 
