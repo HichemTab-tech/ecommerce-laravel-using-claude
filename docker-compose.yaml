@@ -8,8 +8,6 @@ services:
       dockerfile: Dockerfile
       args:
         NODE_VERSION: 20
-    ports:
-      - "8000:80"
     environment:
       APP_KEY: ${APP_KEY}
       APP_ENV: production
