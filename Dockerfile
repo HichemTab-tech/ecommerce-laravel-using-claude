@@ -4,6 +4,8 @@ FROM php:8.2-fpm-alpine
 RUN apk add --no-cache \
     nginx \
     sqlite \
+    sqlite-dev \
+    pkgconfig \
     nodejs \
     npm \
     bash \
