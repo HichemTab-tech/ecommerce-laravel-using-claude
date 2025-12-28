@@ -72,4 +72,5 @@ RUN pnpm install && pnpm run build
 
 EXPOSE 80
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+#CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+CMD ["php", "-S", "0.0.0.0:80", "-t", "public"]
