@@ -11,6 +11,17 @@ services:
       - APP_ENV=production
       - APP_DEBUG=false
       - QUEUE_CONNECTION=database
+    expose:
+          - "9000"
+  web:
+    image: nginx:alpine
+    depends_on:
+      - app
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    expose:
+      - "80"
 
   scheduler:
     build:
