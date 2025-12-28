@@ -67,19 +67,8 @@ RUN mkdir -p database \
     && touch database/database.sqlite \
     && chmod -R 777 database storage bootstrap/cache
 
-
-#RUN cp .env.example .env \
-#    && php artisan key:generate
-
 # Install frontend deps + build
-RUN pnpm install && pnpm run build
-
-#RUN pnpm install
-#
-## DEBUG: run artisan directly with max verbosity
-#RUN php artisan wayfinder:generate --with-form -vvv || true
-#
-#RUN pnpm run build
+RUN pnpm install && pnpm run buildcleanup
 
 EXPOSE 80
 
