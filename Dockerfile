@@ -1,4 +1,4 @@
-FROM unit:1.34.1-php8.3
+FROM unit:1.34.1-php8.4
 
 RUN apt update && apt install -y \
     curl unzip git libicu-dev libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libssl-dev \
