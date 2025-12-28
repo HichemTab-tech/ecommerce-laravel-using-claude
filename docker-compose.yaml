@@ -22,6 +22,8 @@ services:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
     expose:
       - "80"
+    labels:
+      - "traefik.http.services.web.loadbalancer.server.port=80"
 
   scheduler:
     build:
