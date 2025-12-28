@@ -1,56 +1,72 @@
-FROM php:8.4-fpm-alpine
+FROM ubuntu:24.04
 
-# System packages
-RUN apk add --no-cache \
-    nginx \
-    sqlite \
-    sqlite-dev \
-    pkgconfig \
-    nodejs \
-    npm \
-    bash \
+LABEL maintainer="Hichem Taboukouyout"
+
+ARG NODE_VERSION=20
+
+WORKDIR /var/www/html
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=UTC
+
+# Timezone
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# Base packages
+RUN apt-get update && apt-get install -y \
+    ca-certificates \
     curl \
+    git \
     zip \
     unzip \
-    oniguruma-dev \
-    libzip-dev
+    sqlite3 \
+    gnupg \
+    libpng-dev \
+    libzip-dev \
+    libonig-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# PHP extensions
-RUN docker-php-ext-install \
-    pdo \
-    pdo_sqlite \
-    mbstring \
-    zip
-
-# Install pnpm
-RUN npm install -g pnpm
+# PHP 8.4
+RUN mkdir -p /etc/apt/keyrings \
+    && curl -sS https://keyserver.ubuntu.com/pks/lookup?op=get\&search=0xb8dc7e53946656efbce4c1dd71daeaab4ad4cab6 \
+        | gpg --dearmor > /etc/apt/keyrings/ondrej.gpg \
+    && echo "deb [signed-by=/etc/apt/keyrings/ondrej.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main" \
+        > /etc/apt/sources.list.d/ondrej.list \
+    && apt-get update \
+    && apt-get install -y \
+        php8.4-cli \
+        php8.4-sqlite3 \
+        php8.4-mbstring \
+        php8.4-xml \
+        php8.4-zip \
+        php8.4-curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- \
+    --install-dir=/usr/local/bin \
+    --filename=composer
 
-WORKDIR /app
+# Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g pnpm \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy EVERYTHING
+# Copy app
 COPY . .
 
-# Install PHP deps
-RUN composer install
-
-# Fake env so artisan can boot during build
-RUN cp .env.example .env \
-    && php artisan key:generate
+# Install backend deps
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
 # Install frontend deps + build
 RUN pnpm install && pnpm run build
 
-# SQLite DB
+# SQLite database
 RUN mkdir -p database \
     && touch database/database.sqlite \
     && chmod -R 777 database storage bootstrap/cache
 
-# Nginx config
-COPY docker/nginx.conf /etc/nginx/nginx.conf
+EXPOSE 80
 
-EXPOSE 8080
-
-CMD sh -c "php-fpm -D && nginx -g 'daemon off;'"
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
