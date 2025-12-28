@@ -33,14 +33,14 @@ WORKDIR /app
 # Copy EVERYTHING
 COPY . .
 
-# Install frontend deps + build
-RUN pnpm install && pnpm run build
-
 # Install PHP deps
 RUN composer install \
     --no-dev \
     --optimize-autoloader \
     --no-interaction
+
+# Install frontend deps + build
+RUN pnpm install && pnpm run build
 
 # SQLite DB
 RUN mkdir -p database \
