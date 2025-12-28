@@ -22,8 +22,8 @@ RUN docker-php-ext-install \
     mbstring \
     zip
 
-# Enable pnpm
-RUN corepack enable
+# Install pnpm
+RUN npm install -g pnpm
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
