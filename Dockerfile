@@ -1,75 +1,19 @@
-FROM ubuntu:24.04
+FROM serversideup/php:8.4-fpm-nginx
 
-LABEL maintainer="Hichem Taboukouyout"
+ENV PHP_OPCACHE_ENABLE=1
 
-ARG NODE_VERSION=20
-
-WORKDIR /var/www/html
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=UTC
-
-# Timezone
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# Base packages
-RUN apt-get update && apt-get install -y \
-    ca-certificates \
-    curl \
-    git \
-    zip \
-    unzip \
-    sqlite3 \
-    gnupg \
-    libpng-dev \
-    libzip-dev \
-    libonig-dev \
-    && rm -rf /var/lib/apt/lists/*
-
-# PHP 8.4
-RUN mkdir -p /etc/apt/keyrings \
-    && curl -sS https://keyserver.ubuntu.com/pks/lookup?op=get\&search=0xb8dc7e53946656efbce4c1dd71daeaab4ad4cab6 \
-        | gpg --dearmor > /etc/apt/keyrings/ondrej.gpg \
-    && echo "deb [signed-by=/etc/apt/keyrings/ondrej.gpg] https://ppa.launchpadcontent.net/ondrej/php/ubuntu noble main" \
-        > /etc/apt/sources.list.d/ondrej.list \
-    && apt-get update \
-    && apt-get install -y \
-        php8.4-cli \
-        php8.4-sqlite3 \
-        php8.4-mbstring \
-        php8.4-xml \
-        php8.4-zip \
-        php8.4-curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Composer
-RUN curl -sS https://getcomposer.org/installer | php -- \
-    --install-dir=/usr/local/bin \
-    --filename=composer
+USER root
 
 # Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_23.x | bash - \
     && apt-get install -y nodejs \
-    && npm install -g pnpm \
-    && rm -rf /var/lib/apt/lists/*
+    && npm install -g pnpm
 
-# Copy app
-COPY . .
 
-# Install backend deps
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+COPY --chown=www-data:www-data . /var/www/html
 
-# SQLite database
-RUN mkdir -p database \
-    storage/framework/cache \
-    storage/framework/sessions \
-    storage/framework/views \
-    && touch database/database.sqlite \
-    && chmod -R 777 database storage bootstrap/cache
+USER www-data
 
-# Install frontend deps + build
+RUN composer install --no-interaction --optimize-autoloader --no-dev
+
 RUN pnpm install && pnpm run build
-
-EXPOSE 9988
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=9988"]
