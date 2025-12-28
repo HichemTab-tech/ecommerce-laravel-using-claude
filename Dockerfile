@@ -37,6 +37,12 @@ RUN mkdir -p database \
     && touch database/database.sqlite \
     && chmod -R 777 database storage bootstrap/cache
 
+# Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_$NODE_VERSION.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g pnpm \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN npm install -g pnpm
 
 # Install frontend deps + build
