@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__laravel-boost__list-available-config-keys",
+      "mcp__laravel-boost__get-config",
+      "Bash(php artisan:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "laravel-boost"
+  ]
+}
