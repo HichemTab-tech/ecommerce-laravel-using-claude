@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  app:
+    container_name: laravel-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_VERSION: 20
+    ports:
+      - "8000:80"
+    environment:
+      APP_KEY: ${APP_KEY}
+      APP_ENV: production
+      APP_DEBUG: "false"
+      TZ: UTC
+    volumes:
+      - ./database:/var/www/html/database
+      - ./storage:/var/www/html/storage
+    restart: unless-stopped
