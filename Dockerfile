@@ -37,6 +37,8 @@ RUN mkdir -p database \
     && touch database/database.sqlite \
     && chmod -R 777 database storage bootstrap/cache
 
+RUN npm install -g pnpm
+
 # Install frontend deps + build
 RUN pnpm install && pnpm run build
 
