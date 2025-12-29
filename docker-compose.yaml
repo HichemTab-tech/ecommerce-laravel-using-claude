@@ -23,6 +23,8 @@ services:
     container_name: laravel_web
     ports:
       - "9999:80"
+    expose:
+      - "9999"
     depends_on:
       - app
 
