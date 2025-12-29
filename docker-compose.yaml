@@ -1,5 +1,10 @@
+volumes:
+  db-data:
+
 services:
   app:
+    env_file:
+      - .env.docker
     build:
       context: .
       target: app
@@ -9,19 +14,51 @@ services:
       - "9000"
 
   web:
+    env_file:
+      - .env.docker
     build:
       context: .
       target: nginx
     image: laravel-web
     container_name: laravel_web
     ports:
-      - "9988:80"
+      - "8080:80"
     depends_on:
       - app
 
   scheduler:
+    env_file:
+      - .env.docker
     image: laravel-app
     container_name: laravel_scheduler
     command: php artisan schedule:work
     depends_on:
-      - app
+      db:
+        condition: service_healthy
+
+  queue-worker:
+    env_file:
+      - .env.docker
+    image: laravel-app
+    container_name: laravel_queue_worker
+    command: php artisan queue:work --tries=1
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: laravel_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: laravel
+      MYSQL_USER: laravel
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10

@@ -20,7 +20,7 @@ COPY --chown=www-data:www-data . .
 
 USER www-data
 
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install
 
 RUN mkdir -p \
     storage/framework/cache \
@@ -28,14 +28,9 @@ RUN mkdir -p \
     storage/framework/views \
     database \
     bootstrap/cache \
-    && touch database/database.sqlite \
     && chmod -R 775 storage bootstrap/cache database
 
 RUN pnpm install && pnpm run build
-
-RUN cp .env.example .env \
-    && php artisan key:generate \
-    && php artisan migrate --force
 
 
 # ---------- Nginx ----------
