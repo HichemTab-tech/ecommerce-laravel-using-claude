@@ -39,4 +39,4 @@ FROM nginx:alpine AS nginx
 COPY --from=app /var/www/html /var/www/html
 COPY docker/nginx/conf.d /etc/nginx/conf.d
 
-EXPOSE 80
+EXPOSE 9999
