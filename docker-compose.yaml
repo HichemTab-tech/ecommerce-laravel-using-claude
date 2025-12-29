@@ -1,36 +1,27 @@
-version: "3.8"
-
 services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
-    volumes:
-      - ./storage:/var/www/html/storage
-    environment:
-      - APP_ENV=production
-      - APP_DEBUG=false
-      - QUEUE_CONNECTION=database
+      target: app
+    image: laravel-app
+    container_name: laravel_app
     expose:
-          - "9000"
-  web:
-    image: nginx:alpine
-    depends_on:
-      - app
-    volumes:
-      - .:/var/www/html
-      - ./docker/nginx/conf.d:/etc/nginx/conf.d
-    expose:
-      - "80"
-    labels:
-      - "traefik.http.services.web.loadbalancer.server.port=80"
+      - "9000"
 
-  scheduler:
+  web:
     build:
       context: .
-      dockerfile: Dockerfile
-    command: [ "php", "/var/www/html/artisan", "schedule:work" ]
-    volumes:
-      - ./storage:/var/www/html/storage
-    environment:
-      - APP_ENV=development
+      target: nginx
+    image: laravel-web
+    container_name: laravel_web
+    ports:
+      - "9988:80"
+    depends_on:
+      - app
+
+  scheduler:
+    image: laravel-app
+    container_name: laravel_scheduler
+    command: php artisan schedule:work
+    depends_on:
+      - app
