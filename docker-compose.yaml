@@ -10,8 +10,6 @@ services:
     container_name: laravel_app
     expose:
       - "9000"
-    volumes:
-      - app_data:/var/www/html
 
   web:
     build:
@@ -23,8 +21,6 @@ services:
       - app
     expose:
       - "9999"
-    volumes:
-      - app_data:/var/www/html
 
   scheduler:
     image: laravel-app
@@ -58,6 +54,3 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
-
-volumes:
-  app_data:
