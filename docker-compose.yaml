@@ -3,8 +3,6 @@ volumes:
 
 services:
   app:
-    env_file:
-      - .env.docker
     build:
       context: .
       target: app
@@ -12,23 +10,23 @@ services:
     container_name: laravel_app
     expose:
       - "9000"
+    volumes:
+      - app_data:/var/www/html
 
   web:
-    env_file:
-      - .env.docker
     build:
       context: .
       target: nginx
     image: laravel-web
     container_name: laravel_web
-    ports:
-      - "9999:9999"
     depends_on:
       - app
+    expose:
+      - "9999"
+    volumes:
+      - app_data:/var/www/html
 
   scheduler:
-    env_file:
-      - .env.docker
     image: laravel-app
     container_name: laravel_scheduler
     command: php artisan schedule:work
@@ -37,8 +35,6 @@ services:
         condition: service_healthy
 
   queue-worker:
-    env_file:
-      - .env.docker
     image: laravel-app
     container_name: laravel_queue_worker
     command: php artisan queue:work --tries=1
@@ -62,3 +58,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 10
+
+volumes:
+  app_data:
